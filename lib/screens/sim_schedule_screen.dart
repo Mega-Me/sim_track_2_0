@@ -284,16 +284,16 @@ class _FlightRecordContentState extends State<FlightRecordContent> {
             child: records.isEmpty
                 ? const Center(child: Text('No flight records found.'))
                 : ListView.builder(
-              itemCount: records.length,
-              itemBuilder: (context, index) {
-                final record = records[index];
-                return FlightRecordTile(
-                  flight_crew_logo: record.flightCrewLogo,
-                  flight_crew: record.flightCrew,
-                  flight_date: record.flightDate,
-                );
-              },
-            ),
+                    itemCount: records.length,
+                    itemBuilder: (context, index) {
+                      final record = records[index];
+                      return FlightRecordTile(
+                        flight_crew_logo: record.flightCrewLogo,
+                        flight_crew: record.flightCrew,
+                        flight_date: record.flightDate,
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -393,11 +393,14 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.height * 0.01, vertical: size.height * 0.02),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size.height * 0.01,
+                      vertical: size.height * 0.02),
                   child: Center(
                     child: const Text(
                       'Add Flight Record',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -413,7 +416,8 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                       height: size.height * 0.38,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Padding(
                         padding: EdgeInsets.all(size.height * 0.02),
                         child: Column(
@@ -437,7 +441,8 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Padding(
                         padding: EdgeInsets.all(size.height * 0.02),
                         child: Column(
@@ -482,33 +487,51 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                       height: size.height * 0.38,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       child: Padding(
                         padding: EdgeInsets.all(size.height * 0.02),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildTimeField('Start Time', _startTimeController),
                             const SizedBox(height: 16),
                             _buildTimeField('End Time', _endTimeController),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white24,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0,
+                                      vertical: 12.0,
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Add',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _submit,
-                    child: const Text('Add'),
                   ),
                 ],
               ),
@@ -527,7 +550,7 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
         border: const OutlineInputBorder(),
       ),
       validator: (value) =>
-      value?.isEmpty ?? true ? 'Please enter $label' : null,
+          value?.isEmpty ?? true ? 'Please enter $label' : null,
     );
   }
 
@@ -551,16 +574,16 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
         }
       },
       validator: (value) =>
-      value?.isEmpty ?? true ? 'Please select $label' : null,
+          value?.isEmpty ?? true ? 'Please select $label' : null,
     );
   }
 
   Widget _buildRowFields(
-      String label1,
-      TextEditingController controller1,
-      String label2,
-      TextEditingController controller2,
-      ) {
+    String label1,
+    TextEditingController controller1,
+    String label2,
+    TextEditingController controller2,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -600,7 +623,7 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
         }
       },
       validator: (value) =>
-      value?.isEmpty ?? true ? 'Please select $label' : null,
+          value?.isEmpty ?? true ? 'Please select $label' : null,
     );
   }
 }
