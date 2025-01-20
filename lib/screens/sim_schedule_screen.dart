@@ -11,12 +11,25 @@ import '../widgets/flight_record_tile.dart';
 Future<List<dynamic>> fetchFlightRecords() async {
   final response =
       await http.get(Uri.parse('http://localhost:5000/api/flight-records'));
-
   if (response.statusCode == 200) {
     print(response.body);
     return json.decode(response.body);
   } else {
     throw Exception('Failed to load flight records');
+  }
+}
+
+String getCrewLogo(String flight_crew){
+  if(flight_crew.isEmpty){
+    return "assets/logos/et.png";
+  }else if(flight_crew == 'ET' || flight_crew == 'Et' || flight_crew == 'et'){
+    return "assets/logos/et.png";
+  }else if(flight_crew == 'KQ' || flight_crew == 'kq' || flight_crew == 'Kq') {
+    return "assets/logos/kq.png";
+  }else if(flight_crew == 'TAAG' || flight_crew == 'taagg' || flight_crew == 'Taag') {
+    return "assets/logos/taag.png";
+  }else{
+    return "assets/logos/et.png";
   }
 }
 
@@ -267,35 +280,51 @@ class _FlightRecordContentState extends State<FlightRecordContent> {
   Widget build(BuildContext context) {
     final flightRecordProvider = Provider.of<FlightRecordProvider>(context);
     final records = flightRecordProvider.records;
-
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Center(
-              child: Text(
-                'Flight Record',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      backgroundColor: Colors.white.withAlpha(1),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(size.height * 0.02),
+        ),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text(
+                  'Flight Record',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: records.isEmpty
-                ? const Center(child: Text('No flight records found.'))
-                : ListView.builder(
-                    itemCount: records.length,
-                    itemBuilder: (context, index) {
-                      final record = records[index];
-                      return FlightRecordTile(
-                        flight_crew_logo: record.flightCrewLogo,
-                        flight_crew: record.flightCrew,
-                        flight_date: record.flightDate,
-                      );
-                    },
-                  ),
-          ),
-        ],
+            Expanded(
+                child: records.isEmpty
+                    ? const Center(child: Text('No flight records found.'))
+                    : ListView.builder(
+                        itemCount: records.length,
+                        itemBuilder: (context, index) {
+                          final record = records[index];
+                          return FlightRecordTile(
+                            flight_crew_logo: getCrewLogo(record.flightCrew),
+                            flight_crew: record.flightCrew,
+                            flight_date: record.flightDate,
+                            instructor_name_1: record.instructorName1,
+                            instructor_id_1: record.instructorId1,
+                            instructor_name_2: record.instructorName2,
+                            instructor_id_2: record.instructorId2,
+                            trainee_name_1: record.traineeName1,
+                            trainee_id_1: record.traineeId1,
+                            trainee_name_2: record.traineeName2,
+                            trainee_id_2: record.traineeId2,
+                            start_time: record.startTime,
+                            end_time: record.endTime,
+                          );
+                        },
+                      )),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddFlightDialog,
@@ -333,33 +362,44 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
 
   Future<void> _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
+      final payload = {
+        "flightCrew": _crewController.text,
+        "flightDate": _dateController.text,
+        "instructor1": {
+          "name": _instructorName1Controller.text,
+          "reg": _instructorReg1Controller.text,
+        },
+        "instructor2": {
+          "name": _instructorName2Controller.text.isEmpty
+              ? null
+              : _instructorName2Controller.text,
+          "reg": _instructorReg2Controller.text.isEmpty
+              ? null
+              : _instructorReg2Controller.text,
+        },
+        "trainee1": {
+          "name": _traineeName1Controller.text,
+          "reg": _traineeReg1Controller.text,
+        },
+        "trainee2": {
+          "name": _traineeName2Controller.text,
+          "reg": _traineeReg2Controller.text,
+        },
+        "startTime": _startTimeController.text,
+        "endTime": _endTimeController.text,
+      };
+
+      print('Request payload: ${json.encode(payload)}');
+
       try {
         final response = await http.post(
           Uri.parse('http://localhost:5000/api/flight-records'),
           headers: {'Content-Type': 'application/json'},
-          body: json.encode({
-            "flightCrew": _crewController.text,
-            "flightDate": _dateController.text,
-            "instructor1": {
-              "name": _instructorName1Controller.text,
-              "reg": _instructorReg1Controller.text,
-            },
-            "instructor2": {
-              "name": _instructorName2Controller.text,
-              "reg": _instructorReg2Controller.text,
-            },
-            "trainee1": {
-              "name": _traineeName1Controller.text,
-              "reg": _traineeReg1Controller.text,
-            },
-            "trainee2": {
-              "name": _traineeName2Controller.text,
-              "reg": _traineeReg2Controller.text,
-            },
-            "startTime": _startTimeController.text,
-            "endTime": _endTimeController.text,
-          }),
+          body: json.encode(payload),
         );
+
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
 
         if (response.statusCode == 201) {
           Navigator.of(context).pop(); // Close dialog
