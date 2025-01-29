@@ -478,7 +478,7 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                           children: [
                             Center(
                               child: Text(
-                                'Simulator: ${widget.simulatorName}',
+                                'Simulator : ${widget.simulatorName}',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
