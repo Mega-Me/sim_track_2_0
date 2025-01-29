@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sim_track_2_0/models/maintenance_record_model.dart';
+import 'package:sim_track_2_0/providers/maintenance_record_provider.dart';
+import 'package:sim_track_2_0/widgets/add_maintenance_record_dialog.dart';
 import 'package:sim_track_2_0/widgets/flight_record_tile.dart';
+import 'package:sim_track_2_0/widgets/maintenance_record_tile.dart';
 import 'package:sim_track_2_0/widgets/sidebar_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -35,8 +39,8 @@ String getCrewLogo(String flight_crew){
 
 class SimScheduleScreen extends StatefulWidget {
   final String selectedSimStr;
-
   const SimScheduleScreen({super.key, required this.selectedSimStr});
+
 
   @override
   _ScheduleScreenState createState() => _ScheduleScreenState();
@@ -123,13 +127,13 @@ class _ScheduleScreenState extends State<SimScheduleScreen> {
                   label: "Flight Record",
                   isHighlighted: _selectedButton == "Flight Record",
                   onPressed: () =>
-                      _changeContent("Flight Record", FlightRecordContent()),
+                      _changeContent("Flight Record", FlightRecordContent(simulatorName: selectedSim)),
                 ),
                 SidebarButton(
                   label: "Maintenance Record",
                   isHighlighted: _selectedButton == "Maintenance Record",
                   onPressed: () => _changeContent(
-                      "Maintenance Record", MaintenanceRecordContent()),
+                      "Maintenance Record", MaintenanceRecordContent(simulatorName: selectedSim)),
                 ),
                 SidebarButton(
                   label: "Sim Advisory",
@@ -240,6 +244,10 @@ class SimScheduleContent extends StatelessWidget {
 }
 
 class FlightRecordContent extends StatefulWidget {
+
+  final String simulatorName;
+
+  const FlightRecordContent({super.key, required this.simulatorName});
   @override
   _FlightRecordContentState createState() => _FlightRecordContentState();
 }
@@ -270,7 +278,7 @@ class _FlightRecordContentState extends State<FlightRecordContent> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: AddFlightRecordDialog(),
+          child: AddFlightRecordDialog(simulatorName: widget.simulatorName),
         );
       },
     );
@@ -340,6 +348,11 @@ class _FlightRecordContentState extends State<FlightRecordContent> {
 }
 
 class AddFlightRecordDialog extends StatefulWidget {
+  final String simulatorName;
+
+  const AddFlightRecordDialog({super.key, required this.simulatorName});
+
+
   @override
   _AddFlightRecordDialogState createState() => _AddFlightRecordDialogState();
 }
@@ -463,6 +476,13 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            Center(
+                              child: Text(
+                                'Simulator: ${widget.simulatorName}',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
                             _buildTextField(
                               'Flight Crew',
                               _crewController,
@@ -668,18 +688,408 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
   }
 }
 
-class MaintenanceRecordContent extends StatelessWidget {
+class MaintenanceRecordContent extends StatefulWidget {
+
+  final String simulatorName;
+
+  const MaintenanceRecordContent({super.key, required this.simulatorName});
+
+
+  @override
+  _MaintenanceRecordContentState createState() => _MaintenanceRecordContentState();
+}
+
+class _MaintenanceRecordContentState extends State<MaintenanceRecordContent> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
+  }
+
+  Future<void> _loadData() async {
+    try {
+      await Provider.of<FlightRecordProvider>(context, listen: false)
+          .fetchFlightRecords();
+    } catch (error) {
+      print("Error loading data: $error");
+    }
+  }
+
+  Future<void> _showAddMaintenanceDialog() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: AddMaintenanceRecordDialog(simulatorName: widget.simulatorName),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Center(
-          child: Text(
-            'Maintenance Record Screen',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    final flightRecordProvider = Provider.of<FlightRecordProvider>(context);
+    final records = flightRecordProvider.records;
+    final size = MediaQuery.of(context).size;
+    return Scaffold(
+      backgroundColor: Colors.white.withAlpha(1),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(size.height * 0.02),
+        ),
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Center(
+                child: Text(
+                  'Maintenance Record',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            Expanded(
+                child: records.isEmpty
+                    ? const Center(child: Text('No flight records found.'))
+                    : ListView.builder(
+                  itemCount: 1, //records.length,
+                  itemBuilder: (context, index) {
+                    final record = records[index];
+                    return MaintenanceRecordTile(aircraftName: 'B787', maintenanceType: 'Main', startDate: '12-Jan-25', endDate: '13-Jan-25', status: 'Closed',);
+                  },
+                )),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddMaintenanceDialog,
+        backgroundColor: Colors.blueGrey,
+        child: Icon(
+          Icons.local_hospital_sharp,
+          size: 32,
+        ),
+        tooltip: 'Add Maintenance Record',
+      ),
+    );
+  }
+}
+
+class AddMaintenanceRecordDialog extends StatefulWidget {
+
+  final String simulatorName;
+
+  const AddMaintenanceRecordDialog({super.key, required this.simulatorName});
+
+
+  @override
+  _AddMaintenanceRecordDialogState createState() => _AddMaintenanceRecordDialogState();
+}
+
+class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _crewController = TextEditingController();
+  final _maintDefectReporteddateController = TextEditingController();
+  final _instructorName1Controller = TextEditingController();
+  final _instructorReg1Controller = TextEditingController();
+  final _maintDefectDescriptionController = TextEditingController();
+  final _maintDefectResolutionController = TextEditingController();
+  final _maintenanceDoneByRegController = TextEditingController();
+  final _maintDefectClosedDateController = TextEditingController();
+
+
+  Future<void> _submit() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final payload = {
+        "flightCrew": _crewController.text,
+        "instructor1": {
+          "name": _instructorName1Controller.text,
+          "reg": _instructorReg1Controller.text,
+        },
+        "maintDefect": {
+          "maintDefectReportedDate": _maintDefectReporteddateController.text,
+          "maintDefectDescription": _maintDefectDescriptionController.text,
+          "maintDefectResolution": _maintDefectResolutionController.text,
+          "maintDefectClosedDate": _maintDefectClosedDateController.text,
+        },
+        "maintenanceDoneByReg": _maintenanceDoneByRegController.text,
+      };
+
+      print('Request payload: ${json.encode(payload)}');
+
+      try {
+        final response = await http.post(
+          Uri.parse('http://localhost:5000/api/maintenance-records'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(payload),
+        );
+        if (response.statusCode == 201) {
+          Navigator.of(context).pop(); // Close dialog
+        } else {
+          throw Exception('Failed to add flight record');
+        }
+      } catch (error) {
+        print("Error adding flight record: $error");
+      }
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return Container(
+      width: size.width * 0.9,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: size.height * 0.01,
+                      vertical: size.height * 0.02),
+                  child: Center(
+                    child: const Text(
+                      'Add Mainteanance Record',
+                      style:
+                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Column 1: Flight Crew and Flight Date
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: size.height * 0.38,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(size.height * 0.02),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Center(
+                              child: Text(
+                                'Simulator : ${widget.simulatorName}',
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              'Flight Crew',
+                              _crewController, true
+                            ),
+                            const SizedBox(height: 16),
+                            _buildDateField('Flight Date', _maintDefectReporteddateController, true),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Column 2: Instructors and Trainees
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(size.height * 0.02),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 16),
+                            _buildTextField('Defect Description',_maintDefectDescriptionController, true ),
+                            const SizedBox(height: 16),
+                            _buildTextField('Defect Resolution', _maintDefectResolutionController,false),
+
+                            const SizedBox(height: 16),
+                            _buildRowFields(
+                              'Instructor Name',
+                              _instructorName1Controller,
+                              'Instructor Reg',
+                              _instructorReg1Controller,
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: size.height * 0.38,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(size.height * 0.02),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildTextField(
+                              'Done By',  _maintenanceDoneByRegController, false
+                            ),
+                            const SizedBox(height: 16),
+                            _buildDateField('Closed Date', _maintDefectClosedDateController, false),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text('Cancel'),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: _submit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white24,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24.0,
+                                      vertical: 12.0,
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Add',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, TextEditingController controller, bool isMandatory, ) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.multiline,
+      minLines: 1, // Set this
+      maxLines: 4,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      validator: isMandatory
+          ? (value) => value?.isEmpty ?? true ? 'Please enter $label' : null
+          : null, // No validation if not mandatory
+    );
+  }
+
+  Widget _buildDateField(String label, TextEditingController controller, bool isMandatory) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+        );
+        if (pickedDate != null) {
+          controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+        }
+      },
+      validator: isMandatory
+          ? (value) => value?.isEmpty ?? true ? 'Please enter $label' : null
+          : null, // No validation if not mandatory
+    );
+  }
+
+  Widget _buildRowFields(
+      String label1,
+      TextEditingController controller1,
+      String label2,
+      TextEditingController controller2,
+      ) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildTextField(label1, controller1,true),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildTextField(label2, controller2,false),
+        ),
       ],
+    );
+  }
+
+  Widget _buildTimeField(String label, TextEditingController controller) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      readOnly: true,
+      onTap: () async {
+        TimeOfDay? pickedTime = await showTimePicker(
+          context: context,
+          initialTime: TimeOfDay.now(),
+        );
+        if (pickedTime != null) {
+          final now = DateTime.now();
+          final time = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          controller.text = DateFormat('HH:mm').format(time);
+        }
+      },
+      validator: (value) =>
+      value?.isEmpty ?? true ? 'Please select $label' : null,
     );
   }
 }

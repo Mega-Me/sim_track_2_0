@@ -13,7 +13,7 @@ class FlightRecordProvider with ChangeNotifier {
     try {
       final response = await http.get(Uri.parse('http://localhost:5000/api/flight-records'));
 
-      if (response.statusCode == 200) {
+       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         _records = data.map((item) => FlightRecord.fromJson(item)).toList();
         notifyListeners();
