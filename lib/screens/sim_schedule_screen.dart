@@ -147,6 +147,12 @@ class _ScheduleScreenState extends State<SimScheduleScreen> {
                   onPressed: () =>
                       _changeContent("Certificates", CertificatesContent()),
                 ),
+                SidebarButton(
+                  label: "Sim Mnt",
+                  isHighlighted: _selectedButton == "Sim Mnt",
+                  onPressed: () =>
+                      _changeContent("Sim Mnt", SimMntContent()),
+                ),
               ],
             ),
           ),
@@ -1112,6 +1118,18 @@ class CertificatesContent extends StatelessWidget {
     return const Center(
       child: Text(
         'Certificates Screen',
+        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+class SimMntContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'Simulator Maintenance',
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
     );
