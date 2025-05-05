@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import '../providers/flight_record_provider.dart';
+import '../widgets/auth_service.dart';
 import '../widgets/flight_record_tile.dart';
 
 Future<List<dynamic>> fetchFlightRecords() async {
@@ -1124,17 +1125,142 @@ class CertificatesContent extends StatelessWidget {
   }
 }
 
-class SimMntContent extends StatelessWidget {
+class SimMntContent extends StatefulWidget {
+  @override
+  _SimMntContentState createState() => _SimMntContentState();
+}
+
+class _SimMntContentState extends State<SimMntContent> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  final TextEditingController signupNameController = TextEditingController();
+  final TextEditingController signupEmailController = TextEditingController();
+  final TextEditingController signupPasswordController = TextEditingController();
+  final TextEditingController signupRegNoController = TextEditingController();
+  final TextEditingController signupPositionController = TextEditingController();
+
+  bool isSignUp = false;
+  bool isSignedIn = false;
+
+  final String baseUrl = 'http://localhost:5000/api/auth'; // Your Node.js server
+
+  Future<void> _signIn() async {
+    if (_formKey.currentState!.validate()) {
+      final response = await http.post(
+        Uri.parse('$baseUrl/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'regNo': emailController.text,
+          'password': passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() => isSignedIn = true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign In Failed: ${response.body}')),
+        );
+      }
+    }
+  }
+
+  Future<void> _signUp() async {
+    if (_formKey.currentState!.validate()) {
+      final response = await http.post(
+        Uri.parse('$baseUrl/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': signupNameController.text,
+          'email': signupEmailController.text,
+          'regNo': signupRegNoController.text,
+          'password': signupPasswordController.text,
+          'position': signupPositionController.text,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign Up Successful')),
+        );
+        setState(() => isSignUp = false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sign Up Failed: ${response.body}')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Simulator Maintenance',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    if (isSignedIn) {
+      return const Center(child: Text("Welcome to Simulator Maintenance"));
+    }
+
+    var size = MediaQuery.of(context).size;
+    return Center(
+      child: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                isSignUp ? 'Sign Up' : 'Sign In',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 20),
+              if (isSignUp) ...[
+                _buildTextField(signupNameController, 'Name'),
+                _buildTextField(signupEmailController, 'Email (optional)', required: false),
+                _buildTextField(signupRegNoController, 'Reg No'),
+                _buildTextField(signupPasswordController, 'Password', obscure: true),
+                _buildTextField(signupPositionController, 'Position'),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signUp,
+                  child: Text('Register'),
+                ),
+              ] else ...[
+                _buildTextField(emailController, 'Reg No'),
+                _buildTextField(passwordController, 'Password', obscure: true),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signIn,
+                  child: Text('Login'),
+                ),
+              ],
+              TextButton(
+                onPressed: () => setState(() => isSignUp = !isSignUp),
+                child: Text(isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label, {bool obscure = false, bool required = true}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: SizedBox(
+        width: 300,
+        child: TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+          validator: required ? (val) => val == null || val.isEmpty ? 'Enter $label' : null : null,
+        ),
       ),
     );
   }
 }
+
 
 // Logo Widget
 class LogoWidget extends StatelessWidget {

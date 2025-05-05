@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:sim_track_2_0/models/maintenance_record_model.dart';
 import 'dart:convert';
 
-import 'package:sim_track_2_0/screens/sim_schedule_screen.dart';
+import 'package:sim_track_2_0/screens/home_screen.dart';
 
 class MaintenanceRecordProvider with ChangeNotifier {
   List<MaintenanceRecord> _records = [];

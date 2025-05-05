@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sim_track_2_0/providers/simulator_provider.dart';
 import 'package:sim_track_2_0/screens/landing_screen.dart';
 import './providers/flight_record_provider.dart';
-import './screens/sim_schedule_screen.dart';
+import './screens/home_screen.dart';
 
 void main() {
   runApp(

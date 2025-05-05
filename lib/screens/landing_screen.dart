@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:sim_track_2_0/screens/sim_schedule_screen.dart';
+import 'package:sim_track_2_0/screens/home_screen.dart';
 
 
 class LandingPage extends StatefulWidget {
