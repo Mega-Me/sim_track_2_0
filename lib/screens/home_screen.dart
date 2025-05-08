@@ -24,16 +24,22 @@ Future<List<dynamic>> fetchFlightRecords() async {
   }
 }
 
-String getCrewLogo(String flight_crew){
-  if(flight_crew.isEmpty){
+String getCrewLogo(String flight_crew) {
+  if (flight_crew.isEmpty) {
     return "assets/logos/et.png";
-  }else if(flight_crew == 'ET' || flight_crew == 'Et' || flight_crew == 'et'){
+  } else if (flight_crew == 'ET' ||
+      flight_crew == 'Et' ||
+      flight_crew == 'et') {
     return "assets/logos/et.png";
-  }else if(flight_crew == 'KQ' || flight_crew == 'kq' || flight_crew == 'Kq') {
+  } else if (flight_crew == 'KQ' ||
+      flight_crew == 'kq' ||
+      flight_crew == 'Kq') {
     return "assets/logos/kq.png";
-  }else if(flight_crew == 'TAAG' || flight_crew == 'taagg' || flight_crew == 'Taag') {
+  } else if (flight_crew == 'TAAG' ||
+      flight_crew == 'taagg' ||
+      flight_crew == 'Taag') {
     return "assets/logos/taag.png";
-  }else{
+  } else {
     return "assets/logos/et.png";
   }
 }
@@ -41,7 +47,6 @@ String getCrewLogo(String flight_crew){
 class SimScheduleScreen extends StatefulWidget {
   final String selectedSimStr;
   const SimScheduleScreen({super.key, required this.selectedSimStr});
-
 
   @override
   _ScheduleScreenState createState() => _ScheduleScreenState();
@@ -127,14 +132,14 @@ class _ScheduleScreenState extends State<SimScheduleScreen> {
                 SidebarButton(
                   label: "Flight Record",
                   isHighlighted: _selectedButton == "Flight Record",
-                  onPressed: () =>
-                      _changeContent("Flight Record", FlightRecordContent(simulatorName: selectedSim)),
+                  onPressed: () => _changeContent("Flight Record",
+                      FlightRecordContent(simulatorName: selectedSim)),
                 ),
                 SidebarButton(
                   label: "Maintenance Record",
                   isHighlighted: _selectedButton == "Maintenance Record",
-                  onPressed: () => _changeContent(
-                      "Maintenance Record", MaintenanceRecordContent(simulatorName: selectedSim)),
+                  onPressed: () => _changeContent("Maintenance Record",
+                      MaintenanceRecordContent(simulatorName: selectedSim)),
                 ),
                 SidebarButton(
                   label: "Sim Advisory",
@@ -151,8 +156,7 @@ class _ScheduleScreenState extends State<SimScheduleScreen> {
                 SidebarButton(
                   label: "Sim Mnt",
                   isHighlighted: _selectedButton == "Sim Mnt",
-                  onPressed: () =>
-                      _changeContent("Sim Mnt", SimMntContent()),
+                  onPressed: () => _changeContent("Sim Mnt", SimMntContent()),
                 ),
               ],
             ),
@@ -251,7 +255,6 @@ class SimScheduleContent extends StatelessWidget {
 }
 
 class FlightRecordContent extends StatefulWidget {
-
   final String simulatorName;
 
   const FlightRecordContent({super.key, required this.simulatorName});
@@ -358,7 +361,6 @@ class AddFlightRecordDialog extends StatefulWidget {
   final String simulatorName;
 
   const AddFlightRecordDialog({super.key, required this.simulatorName});
-
 
   @override
   _AddFlightRecordDialogState createState() => _AddFlightRecordDialogState();
@@ -486,7 +488,8 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
                             Center(
                               child: Text(
                                 'Simulator : ${widget.simulatorName}',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -696,14 +699,13 @@ class _AddFlightRecordDialogState extends State<AddFlightRecordDialog> {
 }
 
 class MaintenanceRecordContent extends StatefulWidget {
-
   final String simulatorName;
 
   const MaintenanceRecordContent({super.key, required this.simulatorName});
 
-
   @override
-  _MaintenanceRecordContentState createState() => _MaintenanceRecordContentState();
+  _MaintenanceRecordContentState createState() =>
+      _MaintenanceRecordContentState();
 }
 
 class _MaintenanceRecordContentState extends State<MaintenanceRecordContent> {
@@ -732,7 +734,8 @@ class _MaintenanceRecordContentState extends State<MaintenanceRecordContent> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: AddMaintenanceRecordDialog(simulatorName: widget.simulatorName),
+          child:
+              AddMaintenanceRecordDialog(simulatorName: widget.simulatorName),
         );
       },
     );
@@ -765,12 +768,18 @@ class _MaintenanceRecordContentState extends State<MaintenanceRecordContent> {
                 child: records.isEmpty
                     ? const Center(child: Text('No flight records found.'))
                     : ListView.builder(
-                  itemCount: 1, //records.length,
-                  itemBuilder: (context, index) {
-                    final record = records[index];
-                    return MaintenanceRecordTile(aircraftName: 'B787', maintenanceType: 'Main', startDate: '12-Jan-25', endDate: '13-Jan-25', status: 'Closed',);
-                  },
-                )),
+                        itemCount: 1, //records.length,
+                        itemBuilder: (context, index) {
+                          final record = records[index];
+                          return MaintenanceRecordTile(
+                            aircraftName: 'B787',
+                            maintenanceType: 'Main',
+                            startDate: '12-Jan-25',
+                            endDate: '13-Jan-25',
+                            status: 'Closed',
+                          );
+                        },
+                      )),
           ],
         ),
       ),
@@ -788,17 +797,17 @@ class _MaintenanceRecordContentState extends State<MaintenanceRecordContent> {
 }
 
 class AddMaintenanceRecordDialog extends StatefulWidget {
-
   final String simulatorName;
 
   const AddMaintenanceRecordDialog({super.key, required this.simulatorName});
 
-
   @override
-  _AddMaintenanceRecordDialogState createState() => _AddMaintenanceRecordDialogState();
+  _AddMaintenanceRecordDialogState createState() =>
+      _AddMaintenanceRecordDialogState();
 }
 
-class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog> {
+class _AddMaintenanceRecordDialogState
+    extends State<AddMaintenanceRecordDialog> {
   final _formKey = GlobalKey<FormState>();
   final _crewController = TextEditingController();
   final _maintDefectReporteddateController = TextEditingController();
@@ -808,7 +817,6 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
   final _maintDefectResolutionController = TextEditingController();
   final _maintenanceDoneByRegController = TextEditingController();
   final _maintDefectClosedDateController = TextEditingController();
-
 
   Future<void> _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -845,6 +853,7 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -873,7 +882,7 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                     child: const Text(
                       'Add Mainteanance Record',
                       style:
-                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -899,16 +908,16 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                             Center(
                               child: Text(
                                 'Simulator : ${widget.simulatorName}',
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(height: 16),
                             _buildTextField(
-                              'Flight Crew',
-                              _crewController, true
-                            ),
+                                'Flight Crew', _crewController, true),
                             const SizedBox(height: 16),
-                            _buildDateField('Flight Date', _maintDefectReporteddateController, true),
+                            _buildDateField('Flight Date',
+                                _maintDefectReporteddateController, true),
                           ],
                         ),
                       ),
@@ -928,10 +937,11 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                         child: Column(
                           children: [
                             const SizedBox(height: 16),
-                            _buildTextField('Defect Description',_maintDefectDescriptionController, true ),
+                            _buildTextField('Defect Description',
+                                _maintDefectDescriptionController, true),
                             const SizedBox(height: 16),
-                            _buildTextField('Defect Resolution', _maintDefectResolutionController,false),
-
+                            _buildTextField('Defect Resolution',
+                                _maintDefectResolutionController, false),
                             const SizedBox(height: 16),
                             _buildRowFields(
                               'Instructor Name',
@@ -939,7 +949,6 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                               'Instructor Reg',
                               _instructorReg1Controller,
                             ),
-
                           ],
                         ),
                       ),
@@ -959,11 +968,11 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _buildTextField(
-                              'Done By',  _maintenanceDoneByRegController, false
-                            ),
+                            _buildTextField('Done By',
+                                _maintenanceDoneByRegController, false),
                             const SizedBox(height: 16),
-                            _buildDateField('Closed Date', _maintDefectClosedDateController, false),
+                            _buildDateField('Closed Date',
+                                _maintDefectClosedDateController, false),
                             const SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -998,7 +1007,6 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
                           ],
                         ),
                       ),
-
                     ),
                   ),
                 ],
@@ -1010,7 +1018,11 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, bool isMandatory, ) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller,
+    bool isMandatory,
+  ) {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.multiline,
@@ -1026,7 +1038,8 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
     );
   }
 
-  Widget _buildDateField(String label, TextEditingController controller, bool isMandatory) {
+  Widget _buildDateField(
+      String label, TextEditingController controller, bool isMandatory) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
@@ -1052,19 +1065,19 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
   }
 
   Widget _buildRowFields(
-      String label1,
-      TextEditingController controller1,
-      String label2,
-      TextEditingController controller2,
-      ) {
+    String label1,
+    TextEditingController controller1,
+    String label2,
+    TextEditingController controller2,
+  ) {
     return Row(
       children: [
         Expanded(
-          child: _buildTextField(label1, controller1,true),
+          child: _buildTextField(label1, controller1, true),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: _buildTextField(label2, controller2,false),
+          child: _buildTextField(label2, controller2, false),
         ),
       ],
     );
@@ -1096,7 +1109,7 @@ class _AddMaintenanceRecordDialogState extends State<AddMaintenanceRecordDialog>
         }
       },
       validator: (value) =>
-      value?.isEmpty ?? true ? 'Please select $label' : null,
+          value?.isEmpty ?? true ? 'Please select $label' : null,
     );
   }
 }
@@ -1137,14 +1150,18 @@ class _SimMntContentState extends State<SimMntContent> {
 
   final TextEditingController signupNameController = TextEditingController();
   final TextEditingController signupEmailController = TextEditingController();
-  final TextEditingController signupPasswordController = TextEditingController();
+  final TextEditingController signupPasswordController =
+      TextEditingController();
   final TextEditingController signupRegNoController = TextEditingController();
-  final TextEditingController signupPositionController = TextEditingController();
+  final TextEditingController signupPositionController =
+      TextEditingController();
+  String? loggedInUserName;
 
   bool isSignUp = false;
   bool isSignedIn = false;
 
-  final String baseUrl = 'http://localhost:5000/api/auth'; // Your Node.js server
+  final String baseUrl =
+      'http://localhost:5000/api/auth'; // Your Node.js server
 
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
@@ -1158,7 +1175,11 @@ class _SimMntContentState extends State<SimMntContent> {
       );
 
       if (response.statusCode == 200) {
-        setState(() => isSignedIn = true);
+        final body = jsonDecode(response.body);
+        setState(() {
+          isSignedIn = true;
+          loggedInUserName = body['user']['name'];
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Sign In Failed: ${response.body}')),
@@ -1196,11 +1217,81 @@ class _SimMntContentState extends State<SimMntContent> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     if (isSignedIn) {
-      return const Center(child: Text("Welcome to Simulator Maintenance"));
+      return Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+                top: size.height * 0.02,
+                bottom: size.height * 0.005,
+                right: size.height * 0.09),
+
+
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "Welcome ${loggedInUserName ?? ''}",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(size.height * 0.02),
+              child: Container(
+                  width: size.width * 0.76,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(size.height * 0.02),
+                        child: Text("Assignments",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            )),
+                      ),
+                      //Add a list of assignments here
+                    ],
+                  )),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(size.height * 0.02),
+              child: Container(
+                  width: size.width * 0.76,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      Text("DRs",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          )),
+                    ],
+                  )),
+            ),
+          ),
+        ],
+      );
     }
 
-    var size = MediaQuery.of(context).size;
     return Center(
       child: Form(
         key: _formKey,
@@ -1216,9 +1307,11 @@ class _SimMntContentState extends State<SimMntContent> {
               SizedBox(height: 20),
               if (isSignUp) ...[
                 _buildTextField(signupNameController, 'Name'),
-                _buildTextField(signupEmailController, 'Email (optional)', required: false),
+                _buildTextField(signupEmailController, 'Email (optional)',
+                    required: false),
                 _buildTextField(signupRegNoController, 'Reg No'),
-                _buildTextField(signupPasswordController, 'Password', obscure: true),
+                _buildTextField(signupPasswordController, 'Password',
+                    obscure: true),
                 _buildTextField(signupPositionController, 'Position'),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -1236,7 +1329,9 @@ class _SimMntContentState extends State<SimMntContent> {
               ],
               TextButton(
                 onPressed: () => setState(() => isSignUp = !isSignUp),
-                child: Text(isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up'),
+                child: Text(isSignUp
+                    ? 'Already have an account? Sign In'
+                    : 'Don\'t have an account? Sign Up'),
               ),
             ],
           ),
@@ -1245,7 +1340,8 @@ class _SimMntContentState extends State<SimMntContent> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, {bool obscure = false, bool required = true}) {
+  Widget _buildTextField(TextEditingController controller, String label,
+      {bool obscure = false, bool required = true}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: SizedBox(
@@ -1253,14 +1349,16 @@ class _SimMntContentState extends State<SimMntContent> {
         child: TextFormField(
           controller: controller,
           obscureText: obscure,
-          decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
-          validator: required ? (val) => val == null || val.isEmpty ? 'Enter $label' : null : null,
+          decoration:
+              InputDecoration(labelText: label, border: OutlineInputBorder()),
+          validator: required
+              ? (val) => val == null || val.isEmpty ? 'Enter $label' : null
+              : null,
         ),
       ),
     );
   }
 }
-
 
 // Logo Widget
 class LogoWidget extends StatelessWidget {
